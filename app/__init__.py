@@ -4,6 +4,7 @@ from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
 from pathlib import Path
 import os
+import tempfile
 
 # Compatibility shim for Flask-Login with Werkzeug 3+
 try:
@@ -37,7 +38,13 @@ def create_app():
     base_dir = Path(__file__).resolve().parent.parent
     db_url = os.environ.get("DATABASE_URL")
     if not db_url:
-        db_path = base_dir / "potandplants.db"
+        # Vercel's filesystem is read-only at runtime; only /tmp is writable.
+        if os.environ.get("VERCEL") == "1":
+            default_tmp_db = Path(tempfile.gettempdir()) / "potandplants.db"
+            db_path = Path(os.environ.get("SQLITE_PATH", str(default_tmp_db)))
+        else:
+            db_path = base_dir / "potandplants.db"
+        db_path.parent.mkdir(parents=True, exist_ok=True)
         db_url = f"sqlite:///{db_path}"
     app.config["SQLALCHEMY_DATABASE_URI"] = db_url
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
