@@ -1,14 +1,9 @@
-from flask import Flask, jsonify, request
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
-from flask_wtf.csrf import CSRFProtect
 from pathlib import Path
 import os
-import tempfile
-import logging
-import traceback
-from werkzeug.exceptions import HTTPException
 
 # Compatibility shim for Flask-Login with Werkzeug 3+
 try:
@@ -30,28 +25,19 @@ from flask_login import LoginManager
 db = SQLAlchemy()
 login_manager = LoginManager()
 migrate = Migrate()
-csrf = CSRFProtect()
+csrf = None
 bcrypt = Bcrypt()
 
 
 def create_app():
     app = Flask(__name__)
 
-    # Log to stdout (captured by Vercel Function logs)
-    logging.basicConfig(level=os.environ.get("LOG_LEVEL", "INFO"))
-
     # Basic config
     app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-key-change-me")
     base_dir = Path(__file__).resolve().parent.parent
     db_url = os.environ.get("DATABASE_URL")
     if not db_url:
-        # Vercel's filesystem is read-only at runtime; only /tmp is writable.
-        if os.environ.get("VERCEL") == "1":
-            default_tmp_db = Path(tempfile.gettempdir()) / "potandplants.db"
-            db_path = Path(os.environ.get("SQLITE_PATH", str(default_tmp_db)))
-        else:
-            db_path = base_dir / "potandplants.db"
-        db_path.parent.mkdir(parents=True, exist_ok=True)
+        db_path = base_dir / "potandplants.db"
         db_url = f"sqlite:///{db_path}"
     app.config["SQLALCHEMY_DATABASE_URI"] = db_url
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -60,52 +46,35 @@ def create_app():
     db.init_app(app)
     login_manager.init_app(app)
     migrate.init_app(app, db)
-    csrf.init_app(app)
+    # CSRFProtect is optional and causes issues with older Flask-WTF/Flask
+    # If you want CSRF, install compatible versions and enable here:
+    # csrf.init_app(app)
     bcrypt.init_app(app)
 
-    @app.get("/health")
-    def health():
-        return jsonify(
-            ok=True,
-            vercel=os.environ.get("VERCEL"),
-            db=app.config.get("SQLALCHEMY_DATABASE_URI"),
-        )
-
-    @app.errorhandler(Exception)
-    def handle_unexpected_error(err):
-        # Let Flask handle HTTPExceptions (404, 403, etc.)
-        if isinstance(err, HTTPException):
-            return err
-        app.logger.error("Unhandled exception on %s %s", request.method, request.path)
-        app.logger.error("%s", traceback.format_exc())
-        return jsonify(error="Internal Server Error"), 500
-
-    # Ensure tables exist (simple auto-create for dev) and seed demo data.
-    # On serverless platforms, DB creation/writes can fail; don't crash the function on import.
-    try:
-        from . import models  # noqa: F401
-        from .models import Category, Product
-        with app.app_context():
-            db.create_all()
+    # Ensure tables exist (simple auto-create for dev) and seed demo data
+    from . import models  # noqa: F401
+    from .models import Category, Product
+    with app.app_context():
+        db.create_all()
 
         # Seed basic categories if none exist
-            if not Category.query.first():
-                demo_categories = [
-                    Category(name="Indoor Plants", slug="indoor-plants"),
-                    Category(name="Outdoor Plants", slug="outdoor-plants"),
-                    Category(name="Pots", slug="pots"),
-                    Category(name="Gardening Tools", slug="gardening-tools"),
-                ]
-                db.session.add_all(demo_categories)
-                db.session.commit()
+        if not Category.query.first():
+            demo_categories = [
+                Category(name="Indoor Plants", slug="indoor-plants"),
+                Category(name="Outdoor Plants", slug="outdoor-plants"),
+                Category(name="Pots", slug="pots"),
+                Category(name="Gardening Tools", slug="gardening-tools"),
+            ]
+            db.session.add_all(demo_categories)
+            db.session.commit()
 
         # Seed Indian nursery-style demo products if shop has fewer than 20 items
-            if Product.query.count() < 20:
-                indoor = Category.query.filter_by(slug="indoor-plants").first()
-                outdoor = Category.query.filter_by(slug="outdoor-plants").first()
-                pots = Category.query.filter_by(slug="pots").first()
+        if Product.query.count() < 20:
+            indoor = Category.query.filter_by(slug="indoor-plants").first()
+            outdoor = Category.query.filter_by(slug="outdoor-plants").first()
+            pots = Category.query.filter_by(slug="pots").first()
 
-                demo_products = [
+            demo_products = [
                 dict(
                     name="Fiddle Leaf Fig",
                     price=1299.0,
@@ -346,14 +315,11 @@ def create_app():
                     is_best_seller=False,
                     category_id=indoor.id if indoor else None,
                 ),
-                ]
-                for data in demo_products:
-                    if not Product.query.filter_by(name=data["name"]).first():
-                        db.session.add(Product(**data))
-                db.session.commit()
-    except Exception:
-        app.logger.error("DB init/seed failed; continuing without seed data.")
-        app.logger.error("%s", traceback.format_exc())
+            ]
+            for data in demo_products:
+                if not Product.query.filter_by(name=data["name"]).first():
+                    db.session.add(Product(**data))
+            db.session.commit()
 
     login_manager.login_view = "auth.login"
     login_manager.login_message_category = "info"
