@@ -2612,3 +2612,304 @@ body.modal-open {
     }
 }
 
+/* About Us Plant Animation */
+.about-bg {
+    position: relative;
+}
+
+.about-bg .blog-article-body {
+    position: relative;
+    z-index: 1;
+}
+
+.about-bg-art {
+    position: absolute;
+    bottom: -10px;
+    right: 0;
+    width: 320px;
+    height: 400px;
+    z-index: 10;
+    pointer-events: none;
+    transform-origin: bottom center;
+}
+
+.about-pot-wrap {
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+    height: 100%;
+}
+
+.about-pot {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 160px;
+    z-index: 3;
+}
+
+/* Plant container is fixed size, only the stem grows */
+.about-plant {
+    position: absolute;
+    bottom: 65px; /* sit inside the pot */
+    left: 50%;
+    margin-left: -6px; /* center the 12px stem */
+    width: 12px;
+    height: 300px;
+    z-index: 1;
+}
+
+/* Growing stem */
+.about-plant::before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to top, #2d5a27, #4caf50);
+    border-radius: 6px;
+    transform-origin: bottom center;
+    /* Scale Y controls the physical growth, using the --about-grow variable */
+    transform: scaleY(var(--about-grow, 0.12));
+}
+
+/* Leaves */
+.about-leaf {
+    position: absolute;
+    width: 45px;
+    height: 45px;
+    background: #4caf50;
+    border-radius: 45px 0 45px 0;
+    box-shadow: inset -5px -5px 10px rgba(0,0,0,0.15);
+    /* Leaves appear gradually */
+    opacity: calc( (var(--about-grow, 0) - var(--leaf-appear)) * 5 );
+    /* Scale gracefully with clamp, supported everywhere */
+    transform: scale(clamp(0, calc((var(--about-grow, 0) - var(--leaf-appear)) * 5), 1)) rotate(var(--leaf-rot));
+    transform-origin: bottom left;
+    transition: opacity 0.2s;
+}
+
+.leaf-1 { bottom: 15%; left: 100%; --leaf-appear: 0.2; --leaf-rot: 15deg; }
+.leaf-2 { bottom: 30%; right: 100%; --leaf-appear: 0.3; --leaf-rot: -105deg; border-radius: 0 45px 0 45px; transform-origin: bottom right; }
+.leaf-3 { bottom: 45%; left: 100%; --leaf-appear: 0.4; --leaf-rot: 30deg; }
+.leaf-4 { bottom: 60%; right: 100%; --leaf-appear: 0.5; --leaf-rot: -120deg; border-radius: 0 45px 0 45px; transform-origin: bottom right; }
+.leaf-5 { bottom: 75%; left: 100%; --leaf-appear: 0.6; --leaf-rot: 45deg; }
+.leaf-6 { bottom: 85%; right: 100%; --leaf-appear: 0.7; --leaf-rot: -135deg; border-radius: 0 45px 0 45px; transform-origin: bottom right; }
+.leaf-7 { bottom: 95%; left: 100%; --leaf-appear: 0.8; --leaf-rot: 60deg; }
+.leaf-8 { bottom: 100%; right: 100%; --leaf-appear: 0.9; --leaf-rot: -150deg; border-radius: 0 45px 0 45px; transform-origin: bottom right; }
+
+/* Flowers */
+.about-flower {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: #ff5e62;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(255, 94, 98, 0.6);
+    opacity: calc( (var(--about-grow, 0) - var(--flower-appear)) * 5 );
+    transform: scale(clamp(0, calc((var(--about-grow, 0) - var(--flower-appear)) * 5), 1));
+    transition: opacity 0.3s;
+}
+
+.flower-1 { bottom: 20%; left: 200%; --flower-appear: 0.3; }
+.flower-2 { bottom: 35%; right: 200%; --flower-appear: 0.45; }
+.flower-3 { bottom: 55%; left: 180%; --flower-appear: 0.55; }
+.flower-4 { bottom: 70%; right: 180%; --flower-appear: 0.65; }
+.flower-5 { bottom: 88%; left: 220%; --flower-appear: 0.85; }
+.flower-6 { bottom: 102%; right: 150%; --flower-appear: 0.95; }
+
+@media (max-width: 900px) {
+    .about-bg-art { right: -60px; opacity: 0.25; }
+}
+
+/* Sliding Project Drawer */
+body.drawer-open {
+    overflow: hidden;
+}
+
+.project-drawer {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.project-drawer.is-open {
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.drawer-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    opacity: 0;
+    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.project-drawer.is-open .drawer-backdrop {
+    opacity: 1;
+}
+
+.drawer-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(520px, 100vw);
+    background: #ffffff;
+    box-shadow: -15px 0 50px rgba(15, 23, 42, 0.15);
+    transform: translateX(100%);
+    transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.project-drawer.is-open .drawer-panel {
+    transform: translateX(0);
+}
+
+.drawer-close {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(241, 245, 249, 0.8);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(203, 213, 225, 0.5);
+    color: #0f172a;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.drawer-close:hover {
+    background: #e2e8f0;
+    transform: scale(1.05);
+}
+
+.drawer-header {
+    position: relative;
+    padding: 3.5rem 2.2rem 1.8rem;
+    background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+}
+
+.drawer-header h3 {
+    margin: 0 0 0.75rem;
+    font-size: 1.8rem;
+    letter-spacing: -0.02em;
+    color: #0f172a;
+    line-height: 1.2;
+}
+
+.drawer-header p {
+    margin: 0;
+    color: #475569;
+    line-height: 1.65;
+    font-size: 1.05rem;
+}
+
+.drawer-gallery {
+    padding: 2.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    background: #ffffff;
+}
+
+.drawer-item {
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+    background: #f1f5f9;
+}
+
+.drawer-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.drawer-item:hover img {
+    transform: scale(1.02);
+}
+
+/* Bottom Sheet for Mobile */
+@media (max-width: 768px) {
+    .drawer-panel {
+        top: auto;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 85vh;
+        border-radius: 24px 24px 0 0;
+        transform: translateY(100%);
+        box-shadow: 0 -10px 40px rgba(15, 23, 42, 0.15);
+    }
+
+    .project-drawer.is-open .drawer-panel {
+        transform: translateY(0);
+    }
+    
+    .drawer-header {
+        padding: 3.5rem 1.5rem 1.5rem;
+        border-radius: 24px 24px 0 0;
+    }
+    
+    /* Drag Handle Indicator */
+    .drawer-header::before {
+        content: "";
+        position: absolute;
+        top: 14px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 48px;
+        height: 5px;
+        background: #cbd5e1;
+        border-radius: 4px;
+        z-index: 20;
+    }
+
+    .drawer-close {
+        top: 15px;
+        right: 15px;
+        width: 36px;
+        height: 36px;
+        background: #f1f5f9;
+        border: none;
+    }
+
+    .drawer-header h3 {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .drawer-header p {
+        font-size: 0.95rem;
+    }
+
+    .drawer-gallery {
+        padding: 1.5rem;
+        gap: 1.25rem;
+    }
+    
+    .drawer-item {
+        border-radius: 10px;
+    }
+}

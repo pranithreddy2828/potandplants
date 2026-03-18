@@ -226,36 +226,61 @@
             <p class="section-subtitle">A few of our most-loved transformations.</p>
         </div>
         <div class="project-grid project-grid--scroll" id="projects-scroll" aria-label="Project showcase (auto-scrolling)">
-            <article class="project-card">
-                <div class="project-image project-img-1" role="img" aria-label="Backyard garden transformation"></div>
+            <article class="project-card project-drawer-trigger"
+                role="button" tabindex="0"
+                data-project-title="Backyard garden transformations"
+                data-project-description="We design full makeovers for backyards using structured seating, diverse greens, pebble pathways, and elegant lighting to maximize your private outdoor sanctuary."
+                data-project-images="https://images.pexels.com/photos/4503264/pexels-photo-4503264.jpeg?auto=compress&cs=tinysrgb&w=1200,https://picsum.photos/seed/backyard/1400/900,https://picsum.photos/seed/backyard2/1400/900"
+            >
+                <div class="project-image project-img-1" role="img" aria-hidden="true"></div>
                 <div class="project-body">
                     <h3>Backyard garden transformations</h3>
                     <p>Full makeovers with seating, greens, pathways, and lighting.</p>
                 </div>
             </article>
-            <article class="project-card">
-                <div class="project-image project-img-2" role="img" aria-label="Villa landscape design"></div>
+            <article class="project-card project-drawer-trigger"
+                role="button" tabindex="0"
+                data-project-title="Villa landscape designs"
+                data-project-description="Premium exterior setups that match the scale of your villa. We offer curated stonework, layered planting, and bespoke features to elevate your home's architecture."
+                data-project-images="https://images.pexels.com/photos/6207811/pexels-photo-6207811.jpeg?auto=compress&cs=tinysrgb&w=1200,https://picsum.photos/seed/villa/1400/900,https://picsum.photos/seed/villa2/1400/900"
+            >
+                <div class="project-image project-img-2" role="img" aria-hidden="true"></div>
                 <div class="project-body">
                     <h3>Villa landscape designs</h3>
                     <p>Premium layouts that complement architecture and scale.</p>
                 </div>
             </article>
-            <article class="project-card">
-                <div class="project-image project-img-3" role="img" aria-label="Compact space optimization"></div>
+            <article class="project-card project-drawer-trigger"
+                role="button" tabindex="0"
+                data-project-title="Compact space optimization"
+                data-project-description="No space is too small. We introduce clever zoning, vertical gardens, and space-saving furniture to bring a sense of nature to small outdoor areas."
+                data-project-images="https://images.pexels.com/photos/2123482/pexels-photo-2123482.jpeg?auto=compress&cs=tinysrgb&w=1200,https://picsum.photos/seed/compact/1400/900"
+            >
+                <div class="project-image project-img-3" role="img" aria-hidden="true"></div>
                 <div class="project-body">
                     <h3>Compact space optimization</h3>
                     <p>Smart zoning for small outdoor areas without clutter.</p>
                 </div>
             </article>
-            <article class="project-card">
-                <div class="project-image project-img-4" role="img" aria-label="Balcony garden setup"></div>
+            <article class="project-card project-drawer-trigger"
+                role="button" tabindex="0"
+                data-project-title="Balcony garden setups"
+                data-project-description="Transform neglected balconies into your favorite daily retreat. Using specialized planters, vertical greens, and cozy textures to form a quiet nook."
+                data-project-images="https://images.pexels.com/photos/4505170/pexels-photo-4505170.jpeg?auto=compress&cs=tinysrgb&w=1200,https://picsum.photos/seed/balcony/1400/900,https://picsum.photos/seed/balcony2/1400/900"
+            >
+                <div class="project-image project-img-4" role="img" aria-hidden="true"></div>
                 <div class="project-body">
                     <h3>Balcony garden setups</h3>
                     <p>Planters, vertical greens, and cozy corners for daily calm.</p>
                 </div>
             </article>
-            <article class="project-card">
-                <div class="project-image project-img-5" role="img" aria-label="Terrace garden"></div>
+            <article class="project-card project-drawer-trigger"
+                role="button" tabindex="0"
+                data-project-title="Terrace gardens"
+                data-project-description="Layered planting beds, wooden pergolas, and deck zones to completely transform your roof or terrace. Built to endure weather while remaining low maintenance."
+                data-project-images="https://images.pexels.com/photos/4475922/pexels-photo-4475922.jpeg?auto=compress&cs=tinysrgb&w=1200,https://picsum.photos/seed/terrace/1400/900,https://picsum.photos/seed/terrace2/1400/900"
+            >
+                <div class="project-image project-img-5" role="img" aria-hidden="true"></div>
                 <div class="project-body">
                     <h3>Terrace gardens</h3>
                     <p>Layered planting, deck zones, and low-maintenance styling.</p>
@@ -325,6 +350,22 @@
         </div>
     </div>
 </section>
+<!-- Sliding Drawer for Projects -->
+<div class="project-drawer" id="project-drawer" aria-hidden="true">
+    <div class="drawer-backdrop" data-drawer-close></div>
+    <div class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+        <button class="drawer-close" aria-label="Close drawer" data-drawer-close>
+            <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <div class="drawer-header">
+            <h3 id="drawer-title"></h3>
+            <p id="drawer-description"></p>
+        </div>
+        <div class="drawer-gallery" id="drawer-gallery" aria-label="Project images">
+            <!-- Images will be injected here by JS -->
+        </div>
+    </div>
+</div>
 </div>
 {% endblock %}
 
