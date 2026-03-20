@@ -37,8 +37,13 @@ def create_app():
     base_dir = Path(__file__).resolve().parent.parent
     db_url = os.environ.get("DATABASE_URL")
     if not db_url:
-        db_path = base_dir / "potandplants.db"
+        if os.environ.get("VERCEL"):
+            # Vercel's filesystem is read-only, so we use /tmp for the temporary SQLite DB
+            db_path = "/tmp/potandplants.db"
+        else:
+            db_path = base_dir / "potandplants.db"
         db_url = f"sqlite:///{db_path}"
+    
     app.config["SQLALCHEMY_DATABASE_URI"] = db_url
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
